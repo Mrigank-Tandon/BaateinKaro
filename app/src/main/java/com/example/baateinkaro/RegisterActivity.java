@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
-import android.content.Context;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -56,7 +56,7 @@ public class RegisterActivity extends AppCompatActivity {
         if(TextUtils.isEmpty(email)){
             Toast.makeText(this, "Please enter email...", Toast.LENGTH_SHORT).show();
         }
-        if(TextUtils.isEmpty(password)){
+        else if(TextUtils.isEmpty(password)){
             Toast.makeText(this, "Please enter password...", Toast.LENGTH_SHORT).show();
         }
         else{
