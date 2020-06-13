@@ -55,7 +55,7 @@
 
 
     <Button
-        android:id="@+id/login_button"
+        android:id="@+id/register_button"
         android:layout_below="@+id/register_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -75,7 +75,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_below="@id/login_button"
+        android:layout_below="@id/register_button"
         android:text="Already have an Account?"
         android:layout_centerHorizontal="true"
 
