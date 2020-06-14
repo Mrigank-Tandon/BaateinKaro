@@ -22,7 +22,7 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity {
-    private FirebaseUser currentUser;
+
     private Button LoginButton,PhoneLoginButton;
     private EditText UserEmail,UserPassword;
     private TextView NeedNewAccount,ForgetPassword;
@@ -35,7 +35,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         mAuth=FirebaseAuth.getInstance();
-        currentUser=mAuth.getCurrentUser();
+
         InitializeFields();
         NeedNewAccount.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,17 +99,12 @@ public class LoginActivity extends AppCompatActivity {
         loadingBar=new ProgressDialog(this);
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if(currentUser!=null){
-            SendUserToMainActivity();
-        }
-    }
 
     private void SendUserToMainActivity() {
-        Intent loginIntent = new Intent(LoginActivity.this,MainActivity.class);
-        startActivity(loginIntent);
+        Intent mainIntent = new Intent(LoginActivity.this,MainActivity.class);
+        mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(mainIntent);
+        finish();
     }
     private void SendUserToRegisterActivity() {
         Intent registerIntent = new Intent(LoginActivity.this,RegisterActivity.class);
