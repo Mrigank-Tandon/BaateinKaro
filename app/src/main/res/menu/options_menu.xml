@@ -6,7 +6,14 @@
           android:id="@+id/find_friends"
           app:showAsAction="never">
 
+
       </item>
+    <item
+        android:title="Create Group"
+        android:id="@+id/create_group"
+        app:showAsAction="never">
+
+    </item>
     <item
         android:title="Settings"
         android:id="@+id/settings"

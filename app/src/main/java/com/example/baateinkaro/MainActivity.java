@@ -3,15 +3,22 @@ package com.example.baateinkaro;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -106,8 +113,54 @@ public class MainActivity extends AppCompatActivity {
          if(item.getItemId()==R.id.find_friends){
 
          }
+         if(item.getItemId()==R.id.create_group){
+             Requestnewgroup();
+         }
          return true;
     }
+
+    private void Requestnewgroup() {
+
+        AlertDialog.Builder builder=new AlertDialog.Builder(MainActivity.this,R.style.AlertDialog);
+        builder.setTitle("Enter Group Name:");
+        final EditText groupname = new EditText(MainActivity.this);
+        groupname.setHint("eg:Yaar Anmulle");
+        builder.setView(groupname);
+        builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String groupnamefield=groupname.getText().toString();
+                if(TextUtils.isEmpty(groupnamefield)){
+                    Toast.makeText(MainActivity.this, "Please write Group name", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    Createnewgroup(groupnamefield);
+
+                }
+
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+
+            }
+        });
+        builder.show();
+
+    }
+
+    private void Createnewgroup(final String groupnamefield) {
+        rootref.child("Groups").child(groupnamefield).setValue("")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(MainActivity.this, groupnamefield+"is Created", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
     private void SendUserToSettingsActivity() {
         Intent settingsIntent = new Intent(MainActivity.this,SettingsActivity.class);
         settingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
