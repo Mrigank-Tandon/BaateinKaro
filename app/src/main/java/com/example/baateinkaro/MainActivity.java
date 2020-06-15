@@ -68,11 +68,15 @@ public class MainActivity extends AppCompatActivity {
            SendUserToLoginActivity();
          }
          if(item.getItemId()==R.id.settings){
-
+             SendUserToSettingsActivity();
          }
          if(item.getItemId()==R.id.find_friends){
 
          }
          return true;
+    }
+    private void SendUserToSettingsActivity() {
+        Intent settingsIntent = new Intent(MainActivity.this,SettingsActivity.class);
+        startActivity(settingsIntent);
     }
 }
