@@ -1,5 +1,6 @@
 package com.example.baateinkaro;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -8,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -46,6 +48,15 @@ public class GroupFragment extends Fragment {
         grpref= FirebaseDatabase.getInstance().getReference().child("Groups");
         Initializefields();
         retrieveanddisplay();
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String currentgroup=parent.getItemAtPosition(position).toString();
+                Intent grpchat=new Intent(getContext(),GroupChatActivity.class);
+                grpchat.putExtra("groupname",currentgroup);
+                startActivity(grpchat);
+            }
+        });
         return  groupfragment;
     }
 
