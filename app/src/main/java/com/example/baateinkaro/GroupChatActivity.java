@@ -1,6 +1,7 @@
 package com.example.baateinkaro;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -14,8 +15,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.DragStartHelper;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -25,9 +28,11 @@ import com.google.firebase.database.ValueEventListener;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class GroupChatActivity extends AppCompatActivity {
     private Toolbar mtoolbar;
+
     private ImageButton sendmessagebutton;
     private EditText usermessageinput;
     private ScrollView mscrollview;
@@ -56,12 +61,50 @@ public class GroupChatActivity extends AppCompatActivity {
             public void onClick(View v) {
                 savemessagetodatabase();
                 usermessageinput.setText("");
+                mscrollview.fullScroll(ScrollView.FOCUS_DOWN);
             }
         });
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        grpnameref.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                if(dataSnapshot.exists()){
+                    Displaymessages(dataSnapshot);
+                }
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                if(dataSnapshot.exists()){
+                    Displaymessages(dataSnapshot);
+                }
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+
+
     private void savemessagetodatabase() {
-        String message=displayTextmessage.getText().toString();
+        String message=usermessageinput.getText().toString();
         String messagekey=grpnameref.push().getKey();
         if(TextUtils.isEmpty(message)){
             Toast.makeText(this, "please write message", Toast.LENGTH_SHORT).show();
@@ -111,5 +154,16 @@ public class GroupChatActivity extends AppCompatActivity {
         displayTextmessage=findViewById(R.id.text_grp);
         mscrollview=findViewById(R.id.scroll_view);
 
+    }
+    private void Displaymessages(DataSnapshot dataSnapshot) {
+          Iterator iterator=dataSnapshot.getChildren().iterator();
+          while(iterator.hasNext()){
+              String chatdate=(String)((DataSnapshot)iterator.next()).getValue();
+              String chatmessage=(String)((DataSnapshot)iterator.next()).getValue();
+              String chatname=(String)((DataSnapshot)iterator.next()).getValue();
+              String chattime=(String)((DataSnapshot)iterator.next()).getValue();
+              displayTextmessage.append(chatname+" \n"+chatmessage+" \n"+chatdate+"      "+chattime+"\n\n\n");
+              mscrollview.fullScroll(ScrollView.FOCUS_DOWN);
+          }
     }
 }
