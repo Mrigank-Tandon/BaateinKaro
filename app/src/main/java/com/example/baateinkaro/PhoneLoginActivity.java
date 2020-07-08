@@ -21,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class PhoneLoginActivity extends AppCompatActivity {
@@ -75,7 +76,7 @@ public class PhoneLoginActivity extends AppCompatActivity {
             @Override
             public void onVerificationFailed(@NonNull FirebaseException e) {
                 loadingbar.dismiss();
-                Toast.makeText(PhoneLoginActivity.this, "Invalid Phone Number!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(PhoneLoginActivity.this, "Invalid Phone Number!"+e, Toast.LENGTH_LONG).show();
                 sendverificationcodebutton.setVisibility(View.VISIBLE);
                 inputphonenumber.setVisibility(View.VISIBLE);
                 verifybutton.setVisibility(View.INVISIBLE);
@@ -131,7 +132,7 @@ public class PhoneLoginActivity extends AppCompatActivity {
                             SendUserToMainActivity();
 
                         } else {
-                          String message=task.getException().toString();
+                          String message= Objects.requireNonNull(task.getException()).toString();
                             Toast.makeText(PhoneLoginActivity.this, "Error: " +message, Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -139,9 +140,9 @@ public class PhoneLoginActivity extends AppCompatActivity {
     }
     private void SendUserToMainActivity() {
         Intent mainIntent = new Intent(PhoneLoginActivity.this,MainActivity.class);
-        mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
         startActivity(mainIntent);
-        finish();
+
     }
 
     }
