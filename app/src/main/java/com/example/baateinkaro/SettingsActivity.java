@@ -1,10 +1,12 @@
 package com.example.baateinkaro;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -20,6 +22,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.util.HashMap;
 
@@ -32,6 +36,7 @@ public class SettingsActivity extends AppCompatActivity {
     private String Cuurentuserid;
     private FirebaseAuth mauth;
     private DatabaseReference RootRef;
+    private static final int gallerypick=1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +54,16 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
         retriveuserinfo();
+        userimage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent galleryIntent=new Intent();
+                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+                galleryIntent.setType("image/*");
+                startActivityForResult(galleryIntent,gallerypick);
+
+            }
+        });
     }
 
     private void retriveuserinfo() {
@@ -113,6 +128,24 @@ public class SettingsActivity extends AppCompatActivity {
                             }
                         }
                     });
+        }
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==gallerypick && resultCode==RESULT_OK && data!=null){
+            Uri imageuri = data.getData();
+            CropImage.activity()
+                    .setGuidelines(CropImageView.Guidelines.ON)
+                    .setAspectRatio(1,1)
+                    .start(this);
+
+        }
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+
         }
 
     }
