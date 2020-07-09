@@ -76,7 +76,7 @@ public class PhoneLoginActivity extends AppCompatActivity {
             @Override
             public void onVerificationFailed(@NonNull FirebaseException e) {
                 loadingbar.dismiss();
-                Toast.makeText(PhoneLoginActivity.this, "Invalid Phone Number!"+e, Toast.LENGTH_LONG).show();
+                Toast.makeText(PhoneLoginActivity.this, "Invalid Phone Number!"+e, Toast.LENGTH_SHORT).show();
                 sendverificationcodebutton.setVisibility(View.VISIBLE);
                 inputphonenumber.setVisibility(View.VISIBLE);
                 verifybutton.setVisibility(View.INVISIBLE);

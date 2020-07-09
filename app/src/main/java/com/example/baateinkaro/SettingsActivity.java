@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -22,10 +24,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -37,6 +44,8 @@ public class SettingsActivity extends AppCompatActivity {
     private FirebaseAuth mauth;
     private DatabaseReference RootRef;
     private static final int gallerypick=1;
+    private StorageReference userprofileumageref;
+    private ProgressDialog pictureupload;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +53,7 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
         mauth=FirebaseAuth.getInstance();
         RootRef=FirebaseDatabase.getInstance().getReference();
+        userprofileumageref=FirebaseStorage.getInstance().getReference().child("Profile Images");
         Cuurentuserid=mauth.getCurrentUser().getUid();
         InitializeFields();
         username.setVisibility(View.INVISIBLE);
@@ -77,6 +87,7 @@ public class SettingsActivity extends AppCompatActivity {
                             String retrieveuserimage=dataSnapshot.child("image").getValue().toString();
                             username.setText(retrieveusername);
                             userstatus.setText(retrieveuserstatus);
+                            Picasso.get().load(retrieveuserimage).into(userimage);
 
                         }
                         else if((dataSnapshot.exists())&&(dataSnapshot.hasChild("name"))){
@@ -84,6 +95,7 @@ public class SettingsActivity extends AppCompatActivity {
                             String retrieveuserstatus=dataSnapshot.child("status").getValue().toString();
                             username.setText(retrieveusername);
                             userstatus.setText(retrieveuserstatus);
+
                         }
                         else{
                             username.setVisibility(View.VISIBLE);
@@ -145,7 +157,45 @@ public class SettingsActivity extends AppCompatActivity {
         }
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                pictureupload.setTitle("Set Profile Image");
+                pictureupload.setMessage("Please Wait, Your Profile Image is Updating...");
+                pictureupload.setCanceledOnTouchOutside(false);
+                pictureupload.show();
+                Uri resultUri = result.getUri();
+                final StorageReference filepath=userprofileumageref.child(Cuurentuserid+".jpg");
+                filepath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                        if(task.isSuccessful()){
+                            Toast.makeText(SettingsActivity.this, "Profile Picture Uploaded Successfully", Toast.LENGTH_SHORT).show();
+                            final String downloadUrl= Objects.requireNonNull(task.getResult()).getStorage().getDownloadUrl().toString();
+                            RootRef.child("Users").child(Cuurentuserid).child("image")
+                                    .setValue(downloadUrl)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if(task.isSuccessful()){
+                                                Toast.makeText(SettingsActivity.this, "Imaged Saved in Database", Toast.LENGTH_SHORT).show();
+                                                pictureupload.dismiss();
+                                            }
+                                            else{
+                                                String message=task.getException().toString();
+                                                Toast.makeText(SettingsActivity.this, "Error: "+message, Toast.LENGTH_SHORT).show();
+                                                pictureupload.dismiss();
+                                            }
 
+                                        }
+                                    });
+                        }
+                        else{
+                            String message=task.getException().toString();
+                            pictureupload.dismiss();
+                            Toast.makeText(SettingsActivity.this, "Error:"+message, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
         }
 
     }
@@ -155,6 +205,8 @@ public class SettingsActivity extends AppCompatActivity {
         username=findViewById(R.id.set_username);
         userstatus=findViewById(R.id.set_status);
         userimage=findViewById(R.id.profile_image);
+        Context context;
+        pictureupload=new ProgressDialog(this);
     }
     private void SendUserToMainActivity() {
         Intent mainIntent = new Intent(SettingsActivity.this,MainActivity.class);
