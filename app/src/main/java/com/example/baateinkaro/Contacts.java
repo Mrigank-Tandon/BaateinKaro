@@ -1,6 +1,6 @@
 package com.example.baateinkaro;
 
-import android.content.Context;
+
 
 public class Contacts {
     public  String name,status,image;
