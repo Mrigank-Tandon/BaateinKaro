@@ -55,4 +55,20 @@
 
         android:textSize="20sp"
         android:textStyle="bold"/>
+    <Button
+        android:id="@+id/decline_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/message_button"
+        android:layout_marginTop="6dp"
+        android:layout_marginLeft="65dp"
+        android:layout_marginRight="65dp"
+        android:textColor="@android:color/background_light"
+        android:background="@drawable/button"
+        android:text="Cancel Request"
+        android:textAllCaps="false"
+
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:visibility="invisible"/>
 </RelativeLayout>

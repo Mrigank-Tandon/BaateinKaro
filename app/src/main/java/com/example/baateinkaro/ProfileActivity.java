@@ -25,7 +25,7 @@ public class ProfileActivity extends AppCompatActivity {
     private String receiveruserid,senderuserid,currentstate;
     private CircleImageView userprofileimage;
     private TextView userprofilename,userprofilestaus;
-    private Button SendmessageButton;
+    private Button SendmessageButton,DeclinerequestButton;
     private DatabaseReference Userref,chatreqref;
     private FirebaseAuth mauth;
 
@@ -42,6 +42,7 @@ public class ProfileActivity extends AppCompatActivity {
         userprofilename=findViewById(R.id.visit_username);
         userprofilestaus=findViewById(R.id.visit_status);
         SendmessageButton=findViewById(R.id.message_button);
+        DeclinerequestButton=findViewById(R.id.decline_button);
         currentstate="new";
         Retrieveuserinfo();
 
@@ -94,6 +95,18 @@ public class ProfileActivity extends AppCompatActivity {
                                 currentstate="request_sent";
                                 SendmessageButton.setText("Cancel Request");
                             }
+                            else if(request_type.equals("received")){
+                                currentstate="request_received";
+                                SendmessageButton.setText("Accept Request");
+                                DeclinerequestButton.setVisibility(View.VISIBLE);
+                                DeclinerequestButton.setEnabled(true);
+                                DeclinerequestButton.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        cancelchatrequest();
+                                    }
+                                });
+                            }
                         }
                     }
 
@@ -110,6 +123,9 @@ public class ProfileActivity extends AppCompatActivity {
                   if(currentstate.equals("new")){
                       Sendchatrequest();
                   }
+                  if(currentstate.equals("request_sent")){
+                      cancelchatrequest();
+                  }
               }
           });
 
@@ -117,6 +133,35 @@ public class ProfileActivity extends AppCompatActivity {
       else{
           SendmessageButton.setVisibility(View.INVISIBLE);
       }
+    }
+
+    private void cancelchatrequest() {
+        chatreqref.child(senderuserid).child(receiveruserid)
+                .removeValue()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful()){
+                            chatreqref.child(receiveruserid).child(senderuserid)
+                                    .removeValue()
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if(task.isSuccessful()){
+                                                SendmessageButton.setEnabled(true);
+                                                currentstate="new";
+                                                SendmessageButton.setText("Send Message");
+                                                DeclinerequestButton.setVisibility(View.INVISIBLE);
+                                                DeclinerequestButton.setEnabled(false);
+
+                                            }
+                                        }
+                                    });
+
+                        }
+                    }
+                });
+
     }
 
     private void Sendchatrequest() {
